@@ -15,6 +15,11 @@ type GeminiResponse = {
   error?: { message?: string };
 };
 
+type OllamaResponse = {
+  response?: string;
+  error?: string;
+};
+
 export async function callAI(
   provider: Provider,
   apiKey: string,
@@ -27,6 +32,9 @@ export async function callAI(
       return callOpenAI(apiKey, prompt);
     case "gemini":
       return callGemini(apiKey, prompt);
+    case "ollama":
+      // For Ollama, apiKey is treated as the local model name.
+      return callOllama(apiKey, prompt);
   }
 }
 
@@ -76,5 +84,16 @@ async function callGemini(apiKey: string, prompt: string) {
   const data = (await res.json().catch(() => null)) as GeminiResponse | null;
   if (!res.ok) throw new Error(data?.error?.message ?? "Gemini API error");
   return String(data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "");
+}
+
+async function callOllama(model: string, prompt: string) {
+  const res = await fetch("http://127.0.0.1:11434/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model, prompt, stream: false }),
+  });
+  const data = (await res.json().catch(() => null)) as OllamaResponse | null;
+  if (!res.ok) throw new Error(data?.error ?? "Ollama API error");
+  return String(data?.response ?? "");
 }
 

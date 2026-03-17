@@ -1,9 +1,13 @@
-export type Provider = "claude" | "openai" | "gemini";
+export type Provider = "claude" | "openai" | "gemini" | "ollama";
 
 export function validateKeyFormat(
   provider: Provider,
   key: string,
 ): string | null {
+  if (provider === "ollama") {
+    // For Ollama we treat the "key" as the local model name.
+    return key.trim() ? null : "Model name is required";
+  }
   const trimmed = key.trim();
   if (!trimmed) return "API key is required";
 
@@ -11,6 +15,7 @@ export function validateKeyFormat(
     claude: /^sk-ant-[a-zA-Z0-9\-_]{20,}$/,
     openai: /^sk-[a-zA-Z0-9\-_]{20,}$/,
     gemini: /^AIza[a-zA-Z0-9\-_]{35,}$/,
+    ollama: /.^/, // unused thanks to early return above
   };
 
   if (!patterns[provider].test(trimmed)) {
@@ -23,6 +28,10 @@ export async function liveValidateKey(
   provider: Provider,
   apiKey: string,
 ): Promise<{ valid: boolean; error?: string }> {
+  if (provider === "ollama") {
+    // Best-effort: assume model exists; real failure will surface at generation time.
+    return { valid: true };
+  }
   try {
     switch (provider) {
       case "claude": {

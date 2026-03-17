@@ -4,16 +4,11 @@ export async function parseResumeFile(file: File): Promise<string> {
   const buf = Buffer.from(await file.arrayBuffer());
 
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-    // pdf-parse is CommonJS; import dynamically for Next bundlers
-    const mod = (await import("pdf-parse")) as unknown as
-      | ((data: Buffer) => Promise<{ text: string }>)
-      | { default?: (data: Buffer) => Promise<{ text: string }> };
-    const fn = typeof mod === "function" ? mod : mod.default;
-    if (typeof fn !== "function") {
-      throw new Error("PDF parser module shape unsupported");
-    }
-    const result = await fn(buf);
-    return result.text ?? "";
+    // In this dev environment, reliable PDF parsing is not available.
+    // For now, only DOCX is supported to keep the app stable.
+    throw new Error(
+      "PDF parsing is not available in this development environment. Please upload a DOCX file instead.",
+    );
   }
 
   if (

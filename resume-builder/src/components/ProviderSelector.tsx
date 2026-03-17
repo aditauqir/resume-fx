@@ -18,6 +18,15 @@ export function ProviderSelector({ provider, apiKey, onChange }: Props) {
 
   async function verify() {
     setServerError(null);
+    if (provider === "ollama") {
+      // No real remote validation; just mark as verified if model name is present.
+      if (!apiKey.trim()) {
+        setServerError("Model name is required");
+        return;
+      }
+      onChange({ provider, apiKey, verified: true });
+      return;
+    }
     const err = validateKeyFormat(provider, apiKey);
     if (err) {
       setServerError(err);
@@ -44,7 +53,7 @@ export function ProviderSelector({ provider, apiKey, onChange }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        {(["claude", "openai", "gemini"] as Provider[]).map((p) => (
+        {(["claude", "openai", "gemini", "ollama"] as Provider[]).map((p) => (
           <button
             key={p}
             type="button"
@@ -54,25 +63,35 @@ export function ProviderSelector({ provider, apiKey, onChange }: Props) {
                 ? "bg-zinc-950 text-white"
                 : "border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-50"
             }`}
-          >
-            {p === "openai" ? "OpenAI" : p === "claude" ? "Claude" : "Gemini"}
+            >
+            {p === "openai"
+              ? "OpenAI"
+              : p === "claude"
+                ? "Claude"
+                : p === "gemini"
+                  ? "Gemini"
+                  : "Ollama"}
           </button>
         ))}
       </div>
 
       <label className="block">
-        <span className="text-xs font-medium text-zinc-700">API Key</span>
+        <span className="text-xs font-medium text-zinc-700">
+          {provider === "ollama" ? "Ollama model (local)" : "API Key"}
+        </span>
         <input
           value={apiKey}
           onChange={(e) =>
             onChange({ provider, apiKey: e.target.value, verified: false })
           }
           placeholder={
-            provider === "gemini"
-              ? "AIza..."
-              : provider === "claude"
-                ? "sk-ant-..."
-                : "sk-..."
+            provider === "ollama"
+              ? "qwen2.5:7b or llama3.1:8b"
+              : provider === "gemini"
+                ? "AIza..."
+                : provider === "claude"
+                  ? "sk-ant-..."
+                  : "sk-..."
           }
           className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
         />
