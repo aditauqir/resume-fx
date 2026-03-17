@@ -1,0 +1,110 @@
+import { NextResponse } from "next/server";
+import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/supabase";
+import { parseResumeFile } from "@/lib/parseFile";
+import { buildPrompt } from "@/lib/prompt";
+import { callAI } from "@/lib/aiClient";
+import type { Provider } from "@/lib/validateKey";
+import { checkDailyLimit } from "@/lib/rateLimit";
+
+export const runtime = "nodejs";
+
+export async function POST(req: Request) {
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const isAdmin = user.email === process.env.ADMIN_EMAIL;
+  if (!isAdmin) {
+    const used = await checkDailyLimit(user.id, supabase);
+    if (used) return NextResponse.json({ error: "Daily limit reached" }, { status: 429 });
+  }
+
+  const form = await req.formData();
+  const file = form.get("file");
+  const outputFormat = String(form.get("outputFormat") ?? "pdf");
+  const provider = String(form.get("provider") ?? "") as Provider;
+  const apiKey = String(form.get("apiKey") ?? "");
+
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Missing file" }, { status: 400 });
+  }
+  if (outputFormat !== "pdf" && outputFormat !== "latex") {
+    return NextResponse.json({ error: "Invalid outputFormat" }, { status: 400 });
+  }
+  if (!["claude", "openai", "gemini"].includes(provider)) {
+    return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
+  }
+  if (!apiKey.trim()) {
+    return NextResponse.json({ error: "Missing apiKey" }, { status: 400 });
+  }
+
+  const resumeText = await parseResumeFile(file);
+  if (!resumeText.trim()) {
+    return NextResponse.json({ error: "Could not extract text from file" }, { status: 400 });
+  }
+
+  const service = getSupabaseServiceRoleClient();
+
+  const { data: promptRows, error: promptsError } = await service
+    .from("admin_prompts")
+    .select("prompt_text, step_order, is_active")
+    .eq("is_active", true)
+    .order("step_order", { ascending: true });
+  if (promptsError) {
+    return NextResponse.json({ error: "Could not load prompts" }, { status: 500 });
+  }
+
+  const { data: templateRow, error: templateError } = await service
+    .from("admin_template")
+    .select("latex_code")
+    .eq("id", 1)
+    .maybeSingle();
+  if (templateError) {
+    return NextResponse.json({ error: "Could not load template" }, { status: 500 });
+  }
+
+  const steps = (promptRows ?? [])
+    .map((r) => String((r as { prompt_text?: unknown }).prompt_text ?? ""))
+    .filter(Boolean);
+  const latexTemplate = String(templateRow?.latex_code ?? "");
+
+  const prompt = buildPrompt(resumeText, steps.length ? steps : ["Rewrite this resume to be concise, impact-focused, and one page."], latexTemplate);
+  const latex = await callAI(provider, apiKey, prompt);
+
+  if (outputFormat === "latex") {
+    await service.from("usage_logs").insert({ user_id: user.id });
+    return new NextResponse(latex, {
+      headers: {
+        "content-type": "application/x-tex; charset=utf-8",
+        "content-disposition": `attachment; filename="resume.tex"`,
+      },
+    });
+  }
+
+  const compileRes = await fetch("https://latexonline.cc/compile", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `code=${encodeURIComponent(latex)}`,
+  });
+
+  if (!compileRes.ok) {
+    const t = await compileRes.text().catch(() => "");
+    return NextResponse.json(
+      { error: "LaTeX compilation failed", detail: t.slice(0, 2000) },
+      { status: 500 },
+    );
+  }
+
+  const pdf = await compileRes.arrayBuffer();
+  await service.from("usage_logs").insert({ user_id: user.id });
+
+  return new NextResponse(pdf, {
+    headers: {
+      "content-type": "application/pdf",
+      "content-disposition": `attachment; filename="resume.pdf"`,
+    },
+  });
+}
+
