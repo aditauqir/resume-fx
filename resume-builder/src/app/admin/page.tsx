@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/supabase";
+import { getSupabaseServiceRoleClient } from "@/lib/supabase";
+import { requireAdminSession } from "@/lib/adminAuth";
 import { TemplateEditor } from "@/components/admin/TemplateEditor";
 import { PromptChain, type PromptStep } from "@/components/admin/PromptChain";
 import { TicketCenter, type Ticket } from "@/components/admin/TicketCenter";
@@ -12,12 +13,8 @@ export default async function AdminPage({
   const sp = (await searchParams) ?? {};
   const tab = sp.tab ?? "template";
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isAdmin = !!user && user.email === process.env.ADMIN_EMAIL;
-  if (!isAdmin) redirect("/login");
+  const admin = await requireAdminSession();
+  if (!admin) redirect("/admin/login");
 
   const service = getSupabaseServiceRoleClient();
 
@@ -45,7 +42,7 @@ export default async function AdminPage({
               Template • Prompts • Tickets
             </p>
           </div>
-          <form action="/auth/logout" method="post">
+          <form action="/admin/auth/logout" method="post">
             <button className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-950 px-4 text-sm font-medium text-white hover:bg-zinc-800">
               Log out
             </button>

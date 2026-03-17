@@ -1,17 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/supabase";
-
-async function requireAdmin() {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.email !== process.env.ADMIN_EMAIL) return null;
-  return user;
-}
+import { getSupabaseServiceRoleClient } from "@/lib/supabase";
+import { requireAdminSession } from "@/lib/adminAuth";
 
 export async function GET() {
-  const admin = await requireAdmin();
+  const admin = await requireAdminSession();
   if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const service = getSupabaseServiceRoleClient();

@@ -10,8 +10,14 @@ export async function POST(req: Request) {
   const { error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    return NextResponse.redirect(new URL(`/signup`, req.url), { status: 303 });
+    const u = new URL("/signup", req.url);
+    // Keep the message short; don't include sensitive data.
+    u.searchParams.set("error", error.message.slice(0, 160));
+    return NextResponse.redirect(u, { status: 303 });
   }
-  return NextResponse.redirect(new URL("/app", req.url), { status: 303 });
+  return NextResponse.redirect(
+    new URL("/login?signup=success", req.url),
+    { status: 303 },
+  );
 }
 

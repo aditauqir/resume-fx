@@ -5,10 +5,14 @@ export async function parseResumeFile(file: File): Promise<string> {
 
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
     // pdf-parse is CommonJS; import dynamically for Next bundlers
-    const mod = (await import("pdf-parse")) as unknown as {
-      default: (data: Buffer) => Promise<{ text: string }>;
-    };
-    const result = await mod.default(buf);
+    const mod = (await import("pdf-parse")) as unknown as
+      | ((data: Buffer) => Promise<{ text: string }>)
+      | { default?: (data: Buffer) => Promise<{ text: string }> };
+    const fn = typeof mod === "function" ? mod : mod.default;
+    if (typeof fn !== "function") {
+      throw new Error("PDF parser module shape unsupported");
+    }
+    const result = await fn(buf);
     return result.text ?? "";
   }
 

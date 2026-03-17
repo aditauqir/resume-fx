@@ -27,7 +27,7 @@ export function TemplateEditor({ initialCode, updatedAt }: Props) {
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as
-          | { error?: string }
+          | { error?: string; code?: string }
           | null;
         throw new Error(data?.error ?? "Save failed");
       }

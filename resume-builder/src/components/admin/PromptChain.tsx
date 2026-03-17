@@ -39,7 +39,12 @@ export function PromptChain({ initialSteps }: Props) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ prompt_text: newText }),
       });
-      if (!res.ok) throw new Error("Add failed");
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as
+          | { error?: string; code?: string }
+          | null;
+        throw new Error(data?.error ?? "Add failed");
+      }
       setNewText("");
       await reload();
     } catch (e) {

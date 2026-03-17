@@ -9,7 +9,7 @@ export function validateKeyFormat(
 
   const patterns: Record<Provider, RegExp> = {
     claude: /^sk-ant-[a-zA-Z0-9\-_]{20,}$/,
-    openai: /^sk-[a-zA-Z0-9]{20,}$/,
+    openai: /^sk-[a-zA-Z0-9\-_]{20,}$/,
     gemini: /^AIza[a-zA-Z0-9\-_]{35,}$/,
   };
 
