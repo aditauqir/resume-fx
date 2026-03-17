@@ -30,13 +30,13 @@ export async function POST(req: Request) {
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });
   }
-  if (outputFormat !== "pdf" && outputFormat !== "latex") {
+  if (!["pdf", "latex", "hybrid"].includes(outputFormat)) {
     return NextResponse.json({ error: "Invalid outputFormat" }, { status: 400 });
   }
-  if (!["claude", "openai", "gemini"].includes(provider)) {
+  if (!["claude", "openai", "gemini", "ollama"].includes(provider)) {
     return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
   }
-  if (!apiKey.trim()) {
+  if (provider !== "ollama" && !apiKey.trim()) {
     return NextResponse.json({ error: "Missing apiKey" }, { status: 400 });
   }
 
@@ -65,12 +65,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Could not load template" }, { status: 500 });
   }
 
+  const { data: keywordRow, error: keywordsError } = await service
+    .from("admin_keywords")
+    .select("keywords")
+    .eq("id", 1)
+    .maybeSingle();
+  if (keywordsError) {
+    return NextResponse.json({ error: "Could not load keywords" }, { status: 500 });
+  }
+
   const steps = (promptRows ?? [])
     .map((r) => String((r as { prompt_text?: unknown }).prompt_text ?? ""))
     .filter(Boolean);
   const latexTemplate = String(templateRow?.latex_code ?? "");
+  const keywords = String(keywordRow?.keywords ?? "")
+    .split(/[,;\n]+/)
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
 
-  const prompt = buildPrompt(resumeText, steps.length ? steps : ["Rewrite this resume to be concise, impact-focused, and one page."], latexTemplate);
+  const prompt = buildPrompt(
+    resumeText,
+    steps.length
+      ? steps
+      : ["Make this resume as strong, concise, and impactful as possible using the provided LaTeX template, matching its sections and formatting."],
+    latexTemplate,
+    keywords,
+  );
   const latex = await callAI(provider, apiKey, prompt);
 
   if (outputFormat === "latex") {
@@ -92,13 +112,22 @@ export async function POST(req: Request) {
   if (!compileRes.ok) {
     const t = await compileRes.text().catch(() => "");
     return NextResponse.json(
-      { error: "LaTeX compilation failed", detail: t.slice(0, 2000) },
+      { error: "LaTeX compilation failed", detail: t.slice(0, 2000), latex },
       { status: 500 },
     );
   }
 
   const pdf = await compileRes.arrayBuffer();
   await service.from("usage_logs").insert({ user_id: user.id });
+
+  if (outputFormat === "hybrid") {
+    return NextResponse.json({
+      latex,
+      pdfBase64: Buffer.from(pdf).toString("base64"),
+      mime: "application/pdf",
+      filename: "resume.pdf",
+    });
+  }
 
   return new NextResponse(pdf, {
     headers: {

@@ -3,6 +3,7 @@ import { getSupabaseServiceRoleClient } from "@/lib/supabase";
 import { requireAdminSession } from "@/lib/adminAuth";
 import { TemplateEditor } from "@/components/admin/TemplateEditor";
 import { PromptChain, type PromptStep } from "@/components/admin/PromptChain";
+import { KeywordsEditor } from "@/components/admin/KeywordsEditor";
 import { TicketCenter, type Ticket } from "@/components/admin/TicketCenter";
 
 export default async function AdminPage({
@@ -18,12 +19,22 @@ export default async function AdminPage({
 
   const service = getSupabaseServiceRoleClient();
 
-  const [{ data: template }, { data: prompts }, { data: tickets }] = await Promise.all([
+  const [
+    { data: template },
+    { data: prompts },
+    { data: keywords },
+    { data: tickets },
+  ] = await Promise.all([
     service.from("admin_template").select("latex_code, updated_at").eq("id", 1).maybeSingle(),
     service
       .from("admin_prompts")
       .select("id, step_order, prompt_text, is_active")
       .order("step_order", { ascending: true }),
+    service
+      .from("admin_keywords")
+      .select("keywords, updated_at")
+      .eq("id", 1)
+      .maybeSingle(),
     service
       .from("support_tickets")
       .select("id, user_email, subject, message, status, created_at")
@@ -39,7 +50,7 @@ export default async function AdminPage({
               Admin
             </h1>
             <p className="mt-1 text-sm text-zinc-600">
-              Template • Prompts • Tickets
+              Template • Prompts • Keywords • Tickets
             </p>
           </div>
           <form action="/admin/auth/logout" method="post">
@@ -57,6 +68,9 @@ export default async function AdminPage({
             <TabButton href="/admin?tab=prompts" active={tab === "prompts"}>
               Prompts
             </TabButton>
+            <TabButton href="/admin?tab=keywords" active={tab === "keywords"}>
+              Keywords
+            </TabButton>
             <TabButton href="/admin?tab=tickets" active={tab === "tickets"}>
               Tickets
             </TabButton>
@@ -70,6 +84,12 @@ export default async function AdminPage({
             ) : null}
             {tab === "prompts" ? (
               <PromptChain initialSteps={(prompts ?? []) as PromptStep[]} />
+            ) : null}
+            {tab === "keywords" ? (
+              <KeywordsEditor
+                initialKeywords={keywords?.keywords ?? ""}
+                updatedAt={keywords?.updated_at ?? null}
+              />
             ) : null}
             {tab === "tickets" ? (
               <TicketCenter initialTickets={(tickets ?? []) as Ticket[]} />
