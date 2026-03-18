@@ -17,7 +17,7 @@ export function Hero() {
           : "flex-row items-center justify-between"
       }`}>
         <div className={`max-w-[16rem] ${isMobile ? "text-center" : "text-left"}`}>
-          <h1 className="text-balance text-[1.75rem] leading-[0.95] font-normal tracking-tight text-slate-950 sm:text-[2.5rem]">
+          <h1 className={`text-balance text-[1.75rem] font-normal tracking-tight text-slate-950 sm:text-[2.5rem] ${isMobile ? "leading-[0.85]" : "leading-[0.95]"}`}>
             <TypingAnimation
               duration={150}
               typeSpeed={90}
@@ -33,7 +33,7 @@ export function Hero() {
             </TypingAnimation>
           </h1>
         </div>
-        <div className="flex flex-col items-center gap-4">
+        <div className={`flex flex-col items-center gap-4 ${isMobile ? "mt-[0.3rem]" : ""}`}>
           <ShinyButton
             onClick={() => {
               window.location.href = "/login";

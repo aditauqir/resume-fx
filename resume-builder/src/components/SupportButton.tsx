@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSupport } from "@/context/SupportContext";
 
 type Props = {
   userEmail?: string | null;
 };
 
 export function SupportButton({ userEmail }: Props) {
-  const [open, setOpen] = useState(false);
+  const { isOpen: open, openSupport, closeSupport } = useSupport();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState(userEmail ?? "");
@@ -110,7 +111,7 @@ export function SupportButton({ userEmail }: Props) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={openSupport}
         className="fixed right-5 bottom-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-950 text-white shadow-lg hover:bg-zinc-800"
         aria-label="Support"
       >
@@ -124,7 +125,7 @@ export function SupportButton({ userEmail }: Props) {
               <p className="text-sm font-semibold text-zinc-950">Support</p>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeSupport}
                 className="rounded-md px-2 py-1 text-sm text-zinc-600 hover:bg-zinc-50"
               >
                 Close

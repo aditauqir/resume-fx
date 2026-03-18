@@ -1,8 +1,25 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SupportButton } from "@/components/SupportButton";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SupportProvider } from "@/context/SupportContext";
+
+const googleSans = localFont({
+  src: [
+    {
+      path: "./fonts/GoogleSans.ttf",
+      style: "normal",
+    },
+    {
+      path: "./fonts/GoogleSans-Italic.ttf",
+      style: "italic",
+    },
+  ],
+  variable: "--font-google-sans",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,11 +65,13 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${googleSans.variable} bg-background text-foreground antialiased`}
       >
         <ThemeProvider>
-          {children}
-          <SupportButton userEmail={null} />
+          <SupportProvider>
+            {children}
+            <SupportButton userEmail={null} />
+          </SupportProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,16 +1,13 @@
-import { landing } from "@/content/landing";
+"use client";
+
+import Image from "next/image";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { PointerHighlight } from "@/components/ui/pointer-highlight";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 
-const FileIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-  </svg>
-);
-
-const TemplateIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z" />
-  </svg>
+const WandIcon = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faWandMagicSparkles} className={className} />
 );
 
 const ShieldIcon = ({ className }: { className?: string }) => (
@@ -25,22 +22,59 @@ const InboxIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const featureIcons = [FileIcon, TemplateIcon, ShieldIcon, InboxIcon];
+const featureItems = [
+  {
+    title: "One-page focus",
+    description: "Most resumes are outdated. Fine-tune yours for today's hiring pipelines—built to pass algorithms and stand out instantly.",
+    shortDescription: "Most resumes are outdated. Fine-tune yours for today.",
+    Icon: undefined,
+    className: "col-span-1 sm:col-span-2",
+    background: (
+      <Image
+        src="/resume-preview.png"
+        alt="Resume preview"
+        fill
+        className="object-cover object-top opacity-80"
+      />
+    ),
+  },
+  {
+    title: "Fuss Free.",
+    description: "Simple, quick and easy. One drag and drop to thousands of opportunities.",
+    shortDescription: "Simple, quick and easy.",
+    Icon: WandIcon,
+  },
+  {
+    title: "Daily limit",
+    description: "Prevents spam and keeps costs predictable.",
+    Icon: ShieldIcon,
+  },
+  {
+    title: "Support inbox",
+    description: "Built-in support tickets with status tracking.",
+    Icon: InboxIcon,
+  },
+];
 
 export function Features() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-10 sm:px-16 lg:pl-[calc(6rem+25px)] lg:pr-24">
-      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-950">
-        {landing.features.title}
+      <h2 className="mb-8 text-3xl font-semibold tracking-tight text-zinc-950 md:text-4xl">
+        Built for{" "}
+        <PointerHighlight>
+          <span>efficiency</span>
+        </PointerHighlight>
       </h2>
-      <BentoGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[12rem]">
-        {landing.features.items.map((f, index) => (
+      <BentoGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[14rem]">
+        {featureItems.map((f) => (
           <BentoCard
             key={f.title}
             name={f.title}
             description={f.description}
-            Icon={featureIcons[index]}
-            className="col-span-1"
+            shortDescription={f.shortDescription}
+            Icon={f.Icon}
+            background={f.background}
+            className={f.className || "col-span-1"}
           />
         ))}
       </BentoGrid>
