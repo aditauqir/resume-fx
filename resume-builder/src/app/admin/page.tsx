@@ -42,14 +42,14 @@ export default async function AdminPage({
   ]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-6 py-10">
+    <div className="min-h-screen bg-background px-6 py-10 text-foreground">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
               Admin
             </h1>
-            <p className="mt-1 text-sm text-zinc-600">
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               Template • Prompts • Keywords • Tickets
             </p>
           </div>
@@ -60,7 +60,7 @@ export default async function AdminPage({
           </form>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-zinc-200 bg-white p-2">
+        <div className="mt-8 rounded-3xl border border-zinc-200 bg-white p-2 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex flex-wrap gap-2 p-2">
             <TabButton href="/admin?tab=template" active={tab === "template"}>
               Template
@@ -114,7 +114,9 @@ function TabButton({
     <a
       href={href}
       className={`inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-medium ${
-        active ? "bg-zinc-950 text-white" : "text-zinc-700 hover:bg-zinc-50"
+        active
+          ? "bg-zinc-950 text-white dark:bg-zinc-50 dark:text-zinc-950"
+          : "text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
       }`}
     >
       {children}

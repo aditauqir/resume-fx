@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SupportButton } from "@/components/SupportButton";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +11,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -40,12 +46,14 @@ export default async function RootLayout({
   // #endregion
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} bg-background text-foreground antialiased`}
       >
-        {children}
-        <SupportButton userEmail={null} />
+        <ThemeProvider>
+          {children}
+          <SupportButton userEmail={null} />
+        </ThemeProvider>
       </body>
     </html>
   );

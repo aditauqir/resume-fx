@@ -1,6 +1,6 @@
 export const landing = {
   hero: {
-    headline: "Turn your resume into a polished, modern PDF",
+    headline: "Turn your resume into your dream job, instantly.",
     subheadline:
       "Upload a DOCX or PDF, choose your AI provider, and download a one‑page, job-ready resume.",
     cta: "Build My Resume",

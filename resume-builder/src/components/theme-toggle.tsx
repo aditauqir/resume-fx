@@ -1,18 +1,12 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import * as ToggleGroup from "@rn-primitives/toggle-group";
-import { cn } from "@/lib/utils";
-
-const OPTIONS = [
-  { value: "light", label: "Light" },
-  { value: "system", label: "System" },
-  { value: "dark", label: "Dark" },
-] as const;
+import { ShinyButton } from "@/components/ui/shiny-button";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -21,32 +15,23 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="inline-flex rounded-full border border-zinc-200 bg-white p-1 shadow-sm">
-        <div className="h-8 w-24 rounded-full bg-zinc-100" />
+      <div className="flex items-center gap-3">
+        <div className="h-4 w-20 rounded-full bg-zinc-200 dark:bg-zinc-700" />
+        <div className="h-6 w-11 rounded-full bg-zinc-200 dark:bg-zinc-700" />
       </div>
     );
   }
 
+  const isDark = resolvedTheme === "dark";
+
   return (
-    <ToggleGroup.Root
-      type="single"
-      value={theme}
-      onValueChange={(next) => setTheme(next ?? "system")}
-      className="inline-flex rounded-full border border-zinc-200 bg-white p-1 shadow-sm"
+    <ShinyButton
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      style={{ "--primary": "rgb(24 24 27)" } as CSSProperties}
+      className="flex items-center rounded-full border border-zinc-300 bg-white/80 px-3 py-1.5 text-xs font-medium text-zinc-800 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-100 dark:hover:bg-zinc-800"
     >
-      {OPTIONS.map((option) => (
-        <ToggleGroup.Item
-          key={option.value}
-          value={option.value}
-          className={cn(
-            "inline-flex h-8 items-center justify-center rounded-full px-3 text-xs font-medium text-zinc-600 transition-colors",
-            "aria-selected:bg-zinc-950 aria-selected:text-white",
-            "hover:text-zinc-950",
-          )}
-        >
-          {option.label}
-        </ToggleGroup.Item>
-      ))}
-    </ToggleGroup.Root>
+      <span>{isDark ? "Light mode" : "Dark mode"}</span>
+    </ShinyButton>
   );
 }
