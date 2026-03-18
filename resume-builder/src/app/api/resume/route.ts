@@ -8,6 +8,15 @@ import { checkDailyLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
+function normalizeLatex(output: string) {
+  const trimmed = output.trim().replace(/^\uFEFF/, "");
+  const fenceMatch = trimmed.match(/^```(?:latex)?\s*([\s\S]*?)\s*```$/i);
+  const withoutFences = fenceMatch ? fenceMatch[1] : trimmed;
+  const start = withoutFences.indexOf("\\documentclass");
+  if (start >= 0) return withoutFences.slice(start).trim();
+  return withoutFences.trim();
+}
+
 export async function POST(req: Request) {
   const supabase = await getSupabaseServerClient();
   const {
@@ -15,7 +24,8 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const isAdmin = user.email === process.env.ADMIN_EMAIL;
+  const adminEmail = process.env.ADMIN_LOGIN_EMAIL ?? process.env.ADMIN_EMAIL;
+  const isAdmin = user.email === adminEmail;
   if (!isAdmin) {
     const used = await checkDailyLimit(user.id, supabase);
     if (used) return NextResponse.json({ error: "Daily limit reached" }, { status: 429 });
@@ -91,7 +101,7 @@ export async function POST(req: Request) {
     latexTemplate,
     keywords,
   );
-  const latex = await callAI(provider, apiKey, prompt);
+  const latex = normalizeLatex(await callAI(provider, apiKey, prompt));
 
   if (outputFormat === "latex") {
     await service.from("usage_logs").insert({ user_id: user.id });

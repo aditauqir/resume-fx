@@ -230,10 +230,17 @@ export function UploadForm({ alreadyUsedToday }: Props) {
 
       {latexCode ? (
         <div className="mt-4 rounded-3xl border border-zinc-200 bg-white">
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             onClick={() => setLatexOpen((v) => !v)}
-            className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-zinc-950"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLatexOpen((v) => !v);
+              }
+            }}
+            className="flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-semibold text-zinc-950"
           >
             <span>LaTeX output</span>
             <span className="flex items-center gap-2 text-xs text-zinc-500">
@@ -249,10 +256,10 @@ export function UploadForm({ alreadyUsedToday }: Props) {
               </button>
               <span>{latexOpen ? "Hide" : "Show"}</span>
             </span>
-          </button>
+          </div>
           {latexOpen ? (
             <div className="max-h-80 overflow-auto border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-xs font-mono text-zinc-800">
-              <pre className="whitespace-pre-wrap">
+              <pre className="whitespace-pre-wrap text-zinc-950">
 {latexCode}
               </pre>
             </div>

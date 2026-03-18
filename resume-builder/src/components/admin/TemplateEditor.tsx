@@ -65,7 +65,7 @@ export function TemplateEditor({ initialCode, updatedAt }: Props) {
       <textarea
         value={latex}
         onChange={(e) => setLatex(e.target.value)}
-        className="min-h-[420px] w-full resize-y rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-mono text-xs leading-5 text-zinc-900 outline-none focus:border-zinc-400"
+        className="min-h-[420px] w-full resize-y rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-mono text-xs leading-5 text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
         placeholder="Paste your LaTeX template here..."
       />
 

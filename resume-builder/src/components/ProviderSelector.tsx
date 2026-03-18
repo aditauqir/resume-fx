@@ -93,7 +93,7 @@ export function ProviderSelector({ provider, apiKey, onChange }: Props) {
                   ? "sk-ant-..."
                   : "sk-..."
           }
-          className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+          className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
         />
       </label>
 

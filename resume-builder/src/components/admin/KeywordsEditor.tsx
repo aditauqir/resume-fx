@@ -65,7 +65,7 @@ export function KeywordsEditor({ initialKeywords, updatedAt }: Props) {
       <textarea
         value={keywords}
         onChange={(e) => setKeywords(e.target.value)}
-        className="min-h-[220px] w-full resize-y rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm leading-6 text-zinc-900 outline-none focus:border-zinc-400"
+        className="min-h-[220px] w-full resize-y rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm leading-6 text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
         placeholder="e.g. leadership, project management, Python, React"
       />
 

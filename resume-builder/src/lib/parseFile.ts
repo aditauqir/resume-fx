@@ -1,14 +1,17 @@
 import mammoth from "mammoth";
+import { PDFParse } from "pdf-parse";
 
 export async function parseResumeFile(file: File): Promise<string> {
   const buf = Buffer.from(await file.arrayBuffer());
 
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-    // In this dev environment, reliable PDF parsing is not available.
-    // For now, only DOCX is supported to keep the app stable.
-    throw new Error(
-      "PDF parsing is not available in this development environment. Please upload a DOCX file instead.",
-    );
+    const parser = new PDFParse({ data: buf });
+    try {
+      const result = await parser.getText();
+      return result.text ?? "";
+    } finally {
+      await parser.destroy?.();
+    }
   }
 
   if (

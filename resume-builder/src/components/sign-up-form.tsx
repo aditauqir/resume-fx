@@ -39,7 +39,7 @@ export function SignUpForm() {
                 type="email"
                 placeholder="m@example.com"
                 autoComplete="email"
-                className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
                 onKeyDown={onEmailKeyDown}
               />
             </div>
@@ -56,7 +56,7 @@ export function SignUpForm() {
                 name="password"
                 type="password"
                 minLength={8}
-                className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
                 placeholder="At least 8 characters"
               />
             </div>

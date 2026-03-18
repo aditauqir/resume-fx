@@ -22,6 +22,27 @@ export function SupportButton({ userEmail }: Props) {
     setLoading(true);
     setResult(null);
     try {
+      // #region agent log
+      await fetch("http://127.0.0.1:7489/ingest/05527899-20a9-45e1-907b-6d2b6302efe8", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "973277" },
+        body: JSON.stringify({
+          sessionId: "973277",
+          runId: "run3",
+          hypothesisId: "H3",
+          location: "src/components/SupportButton.tsx:21",
+          message: "Support submit clicked",
+          data: {
+            subjectLength: subject.trim().length,
+            messageLength: message.trim().length,
+            emailRequired,
+            emailLength: email.trim().length,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+
       const res = await fetch("/api/support", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -33,10 +54,45 @@ export function SupportButton({ userEmail }: Props) {
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as
-          | { error?: string }
+          | { error?: string; detail?: string; code?: string | null; hint?: string | null }
           | null;
-        throw new Error(data?.error ?? "Support request failed");
+        // #region agent log
+        await fetch("http://127.0.0.1:7489/ingest/05527899-20a9-45e1-907b-6d2b6302efe8", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "973277" },
+          body: JSON.stringify({
+            sessionId: "973277",
+            runId: "run3",
+            hypothesisId: "H4",
+            location: "src/components/SupportButton.tsx:34",
+            message: "Support submit received non-ok response",
+            data: {
+              status: res.status,
+              error: data?.error ?? null,
+              detail: data?.detail ?? null,
+              code: data?.code ?? null,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+        // #endregion
+        throw new Error(data?.detail ?? data?.error ?? "Support request failed");
       }
+      // #region agent log
+      await fetch("http://127.0.0.1:7489/ingest/05527899-20a9-45e1-907b-6d2b6302efe8", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "973277" },
+        body: JSON.stringify({
+          sessionId: "973277",
+          runId: "run3",
+          hypothesisId: "H4",
+          location: "src/components/SupportButton.tsx:43",
+          message: "Support submit succeeded",
+          data: { status: res.status },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       setSubject("");
       setMessage("");
       setResult({ ok: true, text: "Thanks! We'll get back to you soon." });
@@ -82,7 +138,7 @@ export function SupportButton({ userEmail }: Props) {
                     Email (optional)
                   </span>
                   <input
-                    className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                    className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
@@ -95,7 +151,7 @@ export function SupportButton({ userEmail }: Props) {
                   Subject
                 </span>
                 <input
-                  className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                  className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="What can we help with?"
@@ -107,7 +163,7 @@ export function SupportButton({ userEmail }: Props) {
                   Message
                 </span>
                 <textarea
-                  className="mt-1 min-h-28 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                  className="mt-1 min-h-28 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us what's happening..."

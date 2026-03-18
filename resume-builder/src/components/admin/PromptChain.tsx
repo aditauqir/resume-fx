@@ -158,7 +158,7 @@ export function PromptChain({ initialSteps }: Props) {
         <textarea
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
-          className="mt-2 min-h-24 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+          className="mt-2 min-h-24 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
           placeholder="Type a new instruction..."
         />
         <button
@@ -192,7 +192,7 @@ function PromptTextEditor({
       <textarea
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        className="min-h-24 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400 disabled:opacity-60"
+        className="min-h-24 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400 disabled:opacity-60"
         disabled={disabled}
       />
       <div className="flex gap-2">
@@ -223,7 +223,7 @@ function PromptTextEditor({
     <button
       type="button"
       onClick={() => setEditing(true)}
-      className="mt-3 block w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm text-zinc-900 hover:bg-zinc-100"
+      className="mt-3 block w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm text-zinc-950 hover:bg-zinc-100"
     >
       {value}
     </button>

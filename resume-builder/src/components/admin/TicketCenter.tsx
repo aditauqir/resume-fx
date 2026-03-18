@@ -98,7 +98,7 @@ export function TicketCenter({ initialTickets }: Props) {
                     onChange={(e) =>
                       setStatus(t.id, e.target.value as Ticket["status"])
                     }
-                    className="h-9 rounded-xl border border-zinc-200 bg-white px-3 text-sm outline-none focus:border-zinc-400"
+                    className="h-9 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none focus:border-zinc-400"
                   >
                     <option value="open">open</option>
                     <option value="in_progress">in_progress</option>
