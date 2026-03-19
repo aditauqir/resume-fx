@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import { useSupport } from "@/context/SupportContext";
+import { StatefulButton } from "@/components/ui/stateful-button";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   userEmail?: string | null;
@@ -12,15 +14,14 @@ export function SupportButton({ userEmail }: Props) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState(userEmail ?? "");
-  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(
     null,
   );
 
   const emailRequired = useMemo(() => !userEmail, [userEmail]);
 
-  async function submit() {
-    setLoading(true);
+  async function submit(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setResult(null);
     try {
       // #region agent log
@@ -102,8 +103,6 @@ export function SupportButton({ userEmail }: Props) {
         ok: false,
         text: e instanceof Error ? e.message : "Something went wrong",
       });
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -163,22 +162,20 @@ export function SupportButton({ userEmail }: Props) {
                 <span className="text-xs font-medium text-zinc-700">
                   Message
                 </span>
-                <textarea
-                  className="mt-1 min-h-28 w-full resize-y rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400"
+                <Textarea
+                  className="mt-1 min-h-28 resize-y"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us what's happening..."
                 />
               </label>
 
-              <button
-                type="button"
-                disabled={loading || !subject.trim() || !message.trim()}
+              <StatefulButton
                 onClick={submit}
-                className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-zinc-950 px-4 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={!subject.trim() || !message.trim()}
               >
-                {loading ? "Sending..." : "Submit"}
-              </button>
+                Submit
+              </StatefulButton>
 
               {result ? (
                 <p
