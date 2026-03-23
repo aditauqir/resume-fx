@@ -1,0 +1,34 @@
+import { Hero } from "@/components/landing/Hero";
+import { Header } from "@/components/landing/Header";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { Features } from "@/components/landing/Features";
+import { CallToAction } from "@/components/landing/CallToAction";
+import { Legal } from "@/components/landing/Legal";
+import { Footer } from "@/components/landing/Footer";
+import { Stats } from "@/components/landing/Stats";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { AnnouncementBar } from "@/components/landing/AnnouncementBar";
+
+export default function Home() {
+  return (
+    <div className="relative isolate min-h-screen overflow-hidden bg-[#FAFCFC] text-foreground">
+      <AnnouncementBar />
+      <DotPattern
+        className="fixed inset-0 z-0 h-full w-full"
+        glow={true}
+      />
+      <div className="relative z-10 pt-10">
+        <Header />
+        <Hero />
+        <Stats />
+        <HowItWorks />
+        <Features />
+        <CallToAction />
+        <Legal />
+        <Footer />
+      </div>
+      <ProgressiveBlur height="20%" position="bottom" hideOnScrollEnd blurLevels={[0.3, 0.5, 1, 2, 4, 8.5, 16, 32]} />
+    </div>
+  );
+}
