@@ -1,17 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import * as React from "react";
 import { StatefulButton } from "@/components/ui/stateful-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export function SignInForm() {
+interface AdminSignInFormProps {
+  serverError?: string | null;
+}
+
+export function AdminSignInForm({ serverError }: AdminSignInFormProps) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(serverError || null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const passwordInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  React.useEffect(() => {
+    if (serverError) {
+      setError(serverError);
+    }
+  }, [serverError]);
 
   function onEmailKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -40,7 +49,7 @@ export function SignInForm() {
       formData.append("email", email);
       formData.append("password", password);
 
-      const res = await fetch("/auth/login", {
+      const res = await fetch("/admin/auth/login", {
         method: "POST",
         body: formData,
       });
@@ -54,12 +63,12 @@ export function SignInForm() {
         const data = (await res.json().catch(() => null)) as
           | { error?: string }
           | null;
-        throw new Error(data?.error ?? "Sign in failed");
+        throw new Error(data?.error ?? "Admin login failed");
       }
 
-      window.location.href = "/app";
+      window.location.href = "/admin";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
+      setError(err instanceof Error ? err.message : "Admin login failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -70,10 +79,10 @@ export function SignInForm() {
       <div className="rounded-lg bg-white px-6 py-6 sm:px-8">
         <div className="mb-6">
           <h1 className="text-center text-xl font-semibold tracking-tight text-zinc-950 sm:text-left">
-            Sign in to your account
+            Admin Login
           </h1>
           <p className="mt-1 text-center text-sm text-zinc-600 sm:text-left">
-            Welcome back! Please sign in to continue.
+            Sign in with the admin credentials from your .env.local
           </p>
         </div>
 
@@ -86,18 +95,18 @@ export function SignInForm() {
         <div className="space-y-4">
           <div className="space-y-1">
             <label
-              htmlFor="email"
+              htmlFor="admin-email"
               className="text-xs font-medium text-zinc-700"
             >
               Email
             </label>
             <input
-              id="email"
+              id="admin-email"
               name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="baller@hotmail.com"
+              placeholder="admin@example.com"
               autoComplete="email"
               className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
               onKeyDown={onEmailKeyDown}
@@ -105,29 +114,21 @@ export function SignInForm() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center">
-              <label
-                htmlFor="password"
-                className="text-xs font-medium text-zinc-700"
-              >
-                Password
-              </label>
-              <button
-                type="button"
-                className="ml-auto h-4 px-1 py-0 text-xs text-zinc-600 underline"
-              >
-                Forgot your password?
-              </button>
-            </div>
+            <label
+              htmlFor="admin-password"
+              className="text-xs font-medium text-zinc-700"
+            >
+              Password
+            </label>
             <input
               ref={passwordInputRef}
-              id="password"
+              id="admin-password"
               name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-950 placeholder:text-zinc-400 outline-none focus:border-zinc-400"
-              placeholder="Enter your password"
+              placeholder="Enter admin password"
             />
           </div>
 
@@ -140,16 +141,6 @@ export function SignInForm() {
             </StatefulButton>
           </div>
         </div>
-
-        <p className="mt-4 text-center text-sm text-zinc-600">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="text-sm underline underline-offset-4"
-          >
-            Sign up
-          </Link>
-        </p>
       </div>
     </div>
   );

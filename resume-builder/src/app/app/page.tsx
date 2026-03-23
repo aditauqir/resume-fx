@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import { requireAdminSession } from "@/lib/adminAuth";
-import { checkDailyLimit } from "@/lib/rateLimit";
 import { UploadForm } from "@/components/UploadForm";
+import { AppNavbar } from "@/components/app/AppNavbar";
 
 export default async function AppPage() {
   const supabase = await getSupabaseServerClient();
@@ -28,30 +27,20 @@ export default async function AppPage() {
     }),
   }).catch(() => {});
   // #endregion
-  const alreadyUsedToday = await checkDailyLimit(user.id, supabase);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("uploads_left")
+    .eq("id", user.id)
+    .maybeSingle();
+  const uploadsLeft = Number(profile?.uploads_left ?? 10);
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 text-foreground">
-      <div className="mx-auto max-w-3xl">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-              Resume Builder
-            </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Upload your resume, choose a provider, and download a polished
-              output.
-            </p>
-          </div>
-          <form action="/auth/logout" method="post">
-            <button className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-950 px-4 text-sm font-medium text-white hover:bg-zinc-800">
-              Log out
-            </button>
-          </form>
-        </div>
+      <AppNavbar userEmail={user.email ?? null} />
 
-        <div className="mt-8">
-          <UploadForm alreadyUsedToday={alreadyUsedToday} />
+      <div className="mx-auto max-w-3xl">
+        <div className="mt-4">
+          <UploadForm initialUploadsLeft={uploadsLeft} />
         </div>
       </div>
     </div>

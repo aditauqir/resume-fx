@@ -4,26 +4,31 @@ import Image from "next/image";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { PointerHighlight } from "@/components/ui/pointer-highlight";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { faWandMagicSparkles, faHandHoldingDollar } from "@fortawesome/free-solid-svg-icons";
+import { TweetCard } from "@/components/ui/tweet-card";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 const WandIcon = ({ className }: { className?: string }) => (
   <FontAwesomeIcon icon={faWandMagicSparkles} className={className} />
 );
 
-const ShieldIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-  </svg>
+const DollarIcon = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faHandHoldingDollar} className={className} />
 );
 
-const InboxIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-  </svg>
+const PricingTitle = () => (
+  <span>
+    start for <span className="text-[#2CA24C]">$<NumberTicker 
+      value={0} 
+      startValue={100} 
+      direction="up"
+    /></span> today
+  </span>
 );
 
 const featureItems = [
   {
+    id: "one-page",
     title: "One-page focus",
     description: "Most resumes are outdated. Fine-tune yours for today's hiring pipelines—built to pass algorithms and stand out instantly.",
     shortDescription: "Most resumes are outdated. Fine-tune yours for today.",
@@ -39,20 +44,39 @@ const featureItems = [
     ),
   },
   {
+    id: "connections",
+    title: "Better connections",
+    description: "Connect with opportunities worldwide. Get better opportunities with networking, and recruiters.",
+    shortDescription: "Connect with opportunities worldwide.",
+    Icon: undefined,
+    className: "col-span-1 sm:col-span-2 sm:row-span-2",
+    yOffset: 20,
+    background: (
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <TweetCard
+          name="Martha 💫"
+          handle="m.preeta"
+          avatar="/avatar.png"
+          text="I got hired as a software engineer at Cisco! Fix My Resume helped me immensely with landing my dream job. The AI powered resume builder made all the difference!"
+          image="/tweet-image.png"
+          className="scale-90 transform"
+        />
+      </div>
+    ),
+  },
+  {
+    id: "fuss-free",
     title: "Fuss Free.",
     description: "Simple, quick and easy. One drag and drop to thousands of opportunities.",
     shortDescription: "Simple, quick and easy.",
     Icon: WandIcon,
+    bottomAlign: true,
   },
   {
-    title: "Daily limit",
-    description: "Prevents spam and keeps costs predictable.",
-    Icon: ShieldIcon,
-  },
-  {
-    title: "Support inbox",
-    description: "Built-in support tickets with status tracking.",
-    Icon: InboxIcon,
+    id: "pricing",
+    title: <PricingTitle />,
+    description: "We use custom models, or bring your own model to the mix!",
+    Icon: DollarIcon,
   },
 ];
 
@@ -68,12 +92,14 @@ export function Features() {
       <BentoGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[14rem]">
         {featureItems.map((f) => (
           <BentoCard
-            key={f.title}
+            key={f.id}
             name={f.title}
             description={f.description}
             shortDescription={f.shortDescription}
             Icon={f.Icon}
             background={f.background}
+            bottomAlign={f.bottomAlign}
+            yOffset={f.yOffset}
             className={f.className || "col-span-1"}
           />
         ))}

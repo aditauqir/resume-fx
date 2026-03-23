@@ -3,8 +3,9 @@ import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/sup
 
 export async function POST(req: Request) {
   const formData = await req.formData();
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
+  const formAny = formData as any;
+  const email = String(formAny.get?.("email") ?? "");
+  const password = String(formAny.get?.("password") ?? "");
 
   const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     const { error: profileError } = await service.from("profiles").upsert({
       id: user.id,
       email: user.email ?? email,
+      uploads_left: 10,
       updated_at: new Date().toISOString(),
     });
 

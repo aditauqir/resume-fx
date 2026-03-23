@@ -111,7 +111,7 @@ export function SupportButton({ userEmail }: Props) {
       <button
         type="button"
         onClick={openSupport}
-        className="fixed right-5 bottom-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-950 text-white shadow-lg hover:bg-zinc-800"
+        className="fixed right-5 bottom-5 z-50 hidden h-12 w-12 items-center justify-center rounded-full bg-zinc-950 text-white shadow-lg hover:bg-zinc-800 sm:inline-flex"
         aria-label="Support"
       >
         ?

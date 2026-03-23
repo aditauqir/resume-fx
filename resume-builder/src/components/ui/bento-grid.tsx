@@ -11,12 +11,14 @@ interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
-  name: string
+  name: ReactNode
   className?: string
   background?: ReactNode
   Icon?: React.ElementType
   description: string
   shortDescription?: string
+  bottomAlign?: boolean
+  yOffset?: number
 }
 
 const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
@@ -40,6 +42,8 @@ const BentoCard = ({
   Icon,
   description,
   shortDescription,
+  bottomAlign,
+  yOffset,
   ...props
 }: BentoCardProps) => (
   <motion.div
@@ -54,10 +58,10 @@ const BentoCard = ({
     animate="rest"
     {...props}
   >
-    {background && <div className="absolute inset-0">{background}</div>}
+    {background && <div className="absolute inset-0 z-[1]">{background}</div>}
     {background && (
       <motion.div 
-        className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white to-transparent z-[5]"
+        className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white to-transparent z-[5] pointer-events-none"
         variants={{
           rest: { height: "50%" },
           hover: { height: "100%" }
@@ -68,7 +72,7 @@ const BentoCard = ({
     <motion.div 
       className="relative z-10 flex h-full flex-col justify-end p-6"
       variants={{
-        rest: { y: background ? 20 : 0 },
+        rest: { y: yOffset !== undefined ? yOffset : (background || bottomAlign) ? 20 : 0 },
         hover: { y: -20 }
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
@@ -77,13 +81,13 @@ const BentoCard = ({
         {Icon && (
           <Icon className="h-10 w-10 origin-left transform-gpu text-slate-700 transition-all duration-300 ease-in-out" />
         )}
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-slate-900 font-[family-name:var(--font-google-sans)]">
           {name}
         </h3>
         {shortDescription ? (
           <div className="relative min-h-[3rem]">
             <motion.p 
-              className="text-sm text-slate-600"
+              className="text-sm text-slate-600 font-light font-[family-name:var(--font-raleway)]"
               variants={{
                 rest: { opacity: 1 },
                 hover: { opacity: 0 }
@@ -93,7 +97,7 @@ const BentoCard = ({
               {shortDescription}
             </motion.p>
             <motion.p 
-              className="text-sm text-slate-600 absolute top-0 left-0 right-0"
+              className="text-sm text-slate-600 absolute top-0 left-0 right-0 font-light font-[family-name:var(--font-raleway)]"
               variants={{
                 rest: { opacity: 0 },
                 hover: { opacity: 1 }
@@ -104,7 +108,7 @@ const BentoCard = ({
             </motion.p>
           </div>
         ) : (
-          <p className="text-sm text-slate-600">{description}</p>
+          <p className="text-sm text-slate-600 font-light font-[family-name:var(--font-raleway)]">{description}</p>
         )}
       </div>
     </motion.div>

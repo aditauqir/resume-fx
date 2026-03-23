@@ -2,6 +2,8 @@ import { Hero } from "@/components/landing/Hero";
 import { Header } from "@/components/landing/Header";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Features } from "@/components/landing/Features";
+import { CallToAction } from "@/components/landing/CallToAction";
+import { Legal } from "@/components/landing/Legal";
 import { Footer } from "@/components/landing/Footer";
 import { Stats } from "@/components/landing/Stats";
 import { DotPattern } from "@/components/ui/dot-pattern";
@@ -22,6 +24,8 @@ export default function Home() {
         <Stats />
         <HowItWorks />
         <Features />
+        <CallToAction />
+        <Legal />
         <Footer />
       </div>
       <ProgressiveBlur height="20%" position="bottom" hideOnScrollEnd blurLevels={[0.3, 0.5, 1, 2, 4, 8.5, 16, 32]} />

@@ -9,8 +9,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const form = await req.formData();
-  const email = String(form.get("email") ?? "");
-  const password = String(form.get("password") ?? "");
+  // Next/Node may type `req.formData()` with a FormData shape that doesn't include `.get`.
+  // We only need simple string extraction from fields.
+  const formAny = form as any;
+  const email = String(formAny.get?.("email") ?? "");
+  const password = String(formAny.get?.("password") ?? "");
 
   // #region agent log
   await fetch("http://127.0.0.1:7489/ingest/05527899-20a9-45e1-907b-6d2b6302efe8", {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Lexend_Deca, Raleway } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SupportButton } from "@/components/SupportButton";
@@ -36,6 +36,19 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const raleway = Raleway({
+  variable: "--font-raleway",
+  subsets: ["latin"],
+  weight: ["300", "500"],
+});
+
+const lexendDeca = Lexend_Deca({
+  variable: "--font-lexend-deca",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Resume Builder",
   description: "Upload a resume and get a polished PDF or LaTeX.",
@@ -65,7 +78,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${googleSans.variable} bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${googleSans.variable} ${raleway.variable} ${lexendDeca.variable} bg-background text-foreground antialiased`}
       >
         <ThemeProvider>
           <SupportProvider>

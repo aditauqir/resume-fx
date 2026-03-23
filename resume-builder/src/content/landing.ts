@@ -35,7 +35,7 @@ export const landing = {
     ],
   },
   footer: {
-    copyright: `© ${new Date().getFullYear()} Resume Builder`,
+    copyright: "© 2026 ResumeFX",
   },
 };
 
